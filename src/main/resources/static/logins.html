@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-2.1.0.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url:"/login",
+                contentType: "application/json;charset=UTF-8",
+                dataType:"json",
+                data:JSON.stringify({"username":$("#username").val(),"password":$("#password").val()}),
+                type:"POST",
+                success:function(){
+                    alert("success");
+                }
+
+            });
+        });
+    </script>
+</head>
+<body>
+<form action="/login" method="post">
+    用户名：<input type="text" name="username" id="username"/></br>
+    密码：<input type="password" name="password" id="password"/></br>
+    <input type="submit" value="登陆" id="login"/></br>
+    <input type="button" value="注册" onclick="location.href='/register.html'">
+</form>
+</body>
+</html>

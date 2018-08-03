@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-2.1.0.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".user").blur(function () {
+               $.post(
+                    "/register",
+                   {"username":$("#username").val(),"password":$("#password").val()},
+                   function (data) {
+                       if (data){
+                           $("#info").append("用户名已存在");
+                       }
+                   },
+                   "json"
+               );
+            });
+        })
+    </script>
+</head>
+<body>
+<form action="/register" method="post">
+    用户名：<input type="text" name="username" class="user" id="username"><span id="info"></span></br>
+    密码：<input type="password" name="password" class="user" id="password">
+    <input type="submit" value="提交"  onclick="location.href='success.html'">
+</form>
+</body>
+</html>
