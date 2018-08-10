@@ -12,17 +12,9 @@ public class UserService {
     private UserMapper userMapper;
 
 
-    public Integer findTUser(User user){
-        return userMapper.selectByUsername(user);
+    public Integer selectByUser(User user){
+        return userMapper.selectByUser(user);
     }
 
-
-    public  int insert(User user){
-        return userMapper.insertSelective(user);
-    }
-    public boolean exist(String username){
-        int i = userMapper.selectByName(username);
-        return i>0?true:false;
-    }
 }
 

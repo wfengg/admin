@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-2.1.0.js"></script>
+    <script type="text/javascript">
+        function load() {
+            var file = new FormData();
+            file.append("file",$("#file")[0].files[0]);
+            var filename = window.URL.createObjectURL($("#file")[0].files[0]);
+            alert(filename);
+        }
+
+    </script>
+
+</head>
+<body>
+    <input type="file" name=file id="file"/>
+    <input type="button" onclick="load()"/>
+</body>
+</html>

@@ -3,8 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script type="text/javascript" src="js/jquery-2.1.0.js"></script>
+    <script type="text/javascript">
+        document.location.getURLPara = function (name) {
+            var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
+            var arr = this.search.match(reg);
+            if (arr != null) {
+                return decodeURI(arr[0].substring(arr[0].search("=") + 1));
+            }
+            return "";
+        };
+        $(function () {
+            var picturename = document.location.getURLPara("picture");
+            $("img").attr("src","/photo/"+picturename);
+        })
+    </script>
+
 </head>
+
 <body>
-登陆成功
+   成功………………
+    <img src="" height="100px" width="100px"/>
 </body>
 </html>

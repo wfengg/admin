@@ -7,6 +7,8 @@ public class User {
 
     private String password;
 
+    private String headurl;
+
     public Integer getId() {
         return id;
     }
@@ -31,12 +33,11 @@ public class User {
         this.password = password == null ? null : password.trim();
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+    public String getHeadurl() {
+        return headurl;
+    }
+
+    public void setHeadurl(String headurl) {
+        this.headurl = headurl == null ? null : headurl.trim();
     }
 }

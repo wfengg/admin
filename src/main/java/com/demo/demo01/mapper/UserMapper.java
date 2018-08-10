@@ -16,11 +16,13 @@ public interface UserMapper {
     int deleteByExample(UserExample example);
 
     int deleteByPrimaryKey(Integer id);
-    int selectByName(String username);
+
     int insert(User record);
+
+    int selectByUser(User user);
+
     int insertSelective(User record);
 
-    int selectByUsername(User user);
     List<User> selectByExample(UserExample example);
 
     User selectByPrimaryKey(Integer id);

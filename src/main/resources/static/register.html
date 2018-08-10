@@ -5,27 +5,66 @@
     <title>Title</title>
     <script type="text/javascript" src="js/jquery-2.1.0.js"></script>
     <script type="text/javascript">
-        $(function () {
-            $(".user").blur(function () {
-               $.post(
-                    "/register",
-                   {"username":$("#username").val(),"password":$("#password").val()},
-                   function (data) {
-                       if (data){
-                           $("#info").append("用户名已存在");
-                       }
-                   },
-                   "json"
-               );
-            });
-        })
+        var filename;
+
+        function register() {
+                var username=$("#username").val();
+                var password=$("#password").val();
+
+                var data= {
+                    username:username,
+                    password:password,
+                    picture:filename
+                };
+               var sgf = {
+                    type: 'POST',
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (result) {
+                        if(result){
+                            $("#span1").append("用户名已存在");
+                        }else {
+                            var filenames =filename.substring(filename.lastIndexOf("\\") + 1);
+                            window.location.href = "/success.html?picture="+filenames;
+                        }
+                    }
+                };
+               sgf.url="/register";
+                $.ajax(sgf);
+        }
+
+        function upload() {
+            var file = new FormData();
+            file.append('file', $('#file')[0].files[0]);
+            var cgf = {
+                url:'/upload',
+                type: 'POST',
+                data: file,
+                contentType: false,
+                processData:false,
+                cache:false,
+                async:false,
+                success: function (result) {
+                    if(result!="失败"){
+                        filename = result;
+                        //window.URL.createObjectURL可以用于在浏览器上预览本地上传的文件
+                        $("img").show().attr("src",window.URL.createObjectURL( $('#file')[0].files[0]));
+                    }else {
+                        $("#span2").append("图片上传失败")
+                    }
+                }
+            };
+            $.ajax(cgf);
+        }
     </script>
 </head>
+
 <body>
-<form action="/register" method="post">
-    用户名：<input type="text" name="username" class="user" id="username"><span id="info"></span></br>
-    密码：<input type="password" name="password" class="user" id="password">
-    <input type="submit" value="提交"  onclick="location.href='success.html'">
-</form>
+    用户名：<input type="text" name="username"  id="username"/> <span id="span1"></span><br>
+    密码：<input type="password" name="password"  id="password"/><br>
+    上传头像：<input type="file" name="file" id="file" /><input type="button" value="确定" onclick="upload()"/><span id="span2"></span><br/>
+    <img hidden="hidden" src="" height="100px" width="100px"><br/>
+    <input type="button" value="提交"  onclick="register()"/><br>
 </body>
 </html>
