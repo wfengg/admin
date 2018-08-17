@@ -19,8 +19,8 @@ public interface UserMapper {
 
     int insert(User record);
 
-    int selectByUser(User user);
-
+    Integer selectByUser(User user);
+    int selectByUsername(String username);
     int insertSelective(User record);
 
     List<User> selectByExample(UserExample example);

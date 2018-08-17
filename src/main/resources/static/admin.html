@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/jquery-2.1.0.js"></script>
+    <script type="text/javascript">
+        var msgId = new Array();
+        var fId = new Array();
+        function showmsg() {
+            var pageNumber = 1;
+            $.ajax({
+                type:"post",
+                url:"/showAllMsg",
+                data:{pageNumber:pageNumber},
+                dataType:"json",
+                success:function (result) {
+                    $("#showHead").append("<thead id='head'><tr><th>内容</th><th>联系方式</th><th>留言人</th><th>留言日期</th><th>操作</th></tr></thead>");
+                    if(result.code===100){
+                        alert("请先登录")
+                    }else {
+                        for(var i = 0;i<result.pageSize;i++){
+                            $("#showWords").append("<tr id=a"+result.data[i].id+"><td>"+result.data[i].words+"&nbsp;&nbsp;&nbsp;</td><td>"+result.data[i].tel+"</td><td>"+result.username[i]+"</td>" +
+                                "<td>"+result.data[i].time+"&nbsp;&nbsp;&nbsp;</td><td><input type='button' value='删除' id="+result.data[i].id+" class='delete'></td></tr>");
+                            if(result.data[i].userid!==null){
+                                $("#a"+result.data[i].id+"").append("<td><input type='text' size='30' maxlength='30' id=h"+result.data[i].id+"><input type='button' value='回复' class='huifu' userId="+result.data[i].userid+" name="+result.data[i].id+"></td>");
+                            }
+                            if(result.pageNumber===result.totalPage&&result.totalRecord<result.pageNumber*result.pageSize){
+                                result.pageSize = result.totalRecord%result.pageSize;
+                            }
+                            msgId[i] = result.data[i].id;
+                        }
+
+                        for(var j =1;j<=result.totalPage;j++){
+                            $("#page").append("<b id=f"+j+" class='page'><button  class='skipmsg' id="+j+">第"+j+"页&nbsp;&nbsp;&nbsp;</button></b>");
+                            fId[j] = j;
+                        }
+                    }
+                }
+            });
+            $("#mywords").attr("disabled","disabled");
+        }
+
+        $(document).on("click",".skipmsg",function () {
+            var pageNumber = $(this).attr("id");
+            for(var i = 0;i<msgId.length;i++){
+                $("#a"+msgId[i]+"").remove();
+            }
+            for(var j = 1;j<fId.length;j++){
+                $("#f"+fId[j]+"").remove();
+            }
+            $.ajax({
+                type : "post",
+                url : "/showAllMsg",
+                data:{pageNumber:pageNumber},
+                dataType : "json",
+                success : function(result) {
+                    if(result.code===100){
+                        alert("请登录")
+                    }else {
+                        for(var i = 0;i<result.pageSize;i++){
+                            $("#showWords").append("<tr id=a"+result.data[i].id+"><td>"+result.data[i].words+"&nbsp;&nbsp;&nbsp;</td><td>"+result.data[i].tel+"</td><td>"+result.username[i]+"</td><td>"+result.data[i].time+"&nbsp;&nbsp;&nbsp;</td>" +
+                                "<td><input type='button' value='删除' id="+result.data[i].id+" class='delete'></td></tr>");
+                            if(result.data[i].userid!==null){
+                            $("#a"+result.data[i].id+"").append("<td><input type='text' size='30' maxlength='30' id=h"+result.data[i].id+"><input type='button' value='回复' class='huifu' userId="+result.data[i].userid+" name="+result.data[i].id+"></td>");
+                            }
+                            if(result.pageNumber===result.totalPage&&result.totalRecord<result.pageNumber*result.pageSize){
+                                result.pageSize = result.totalRecord%result.pageSize;
+                            }
+                            msgId[i] = result.data[i].id;
+                        }
+
+                        for(var j =1;j<=result.totalPage;j++){
+                            $("#page").append("<b id=f"+j+"><button  class='skipmsg' id="+j+">第"+j+"页&nbsp;&nbsp;&nbsp;</button></b>");
+                            fId[j] = j;
+                        }
+                    }
+                }
+            })
+        })
+
+        $(document).on("click",".delete",function () {
+            var id = $(this).attr("id");
+            $.ajax({
+                type:"post",
+                url:"/deleteMsg",
+                data:{id:id},
+                dataType:"json",
+                success:function (result) {
+                    if(result.code===0){
+                        $("#a"+id+"").remove();
+                    }else if(result.code===100){
+                        alert("请登录")
+                    }else {
+                        alert("删除失败")
+                    }
+                }
+            });
+        })
+
+        $(document).on("click",".huifu",function () {
+            var msgid = $(this).attr("name");
+            var userid = $(this).attr("userId");
+            var reply =$("#h"+msgid+"").val();
+
+           $.ajax({
+               type:"post",
+               url:"/replyMsg",
+               data:JSON.stringify({userid:userid,msgid:msgid,reply:reply}),
+               dataType:"json",
+               contentType: "application/json",
+               success:function (result) {
+                    if(result.code===0){
+                        alert("回复成功")
+                    }else {
+                        alert("回复失败")
+                    }
+               }
+           })
+        })
+    </script>
+</head>
+<body>
+<input type="button" value="所有留言" id="mywords" onclick="showmsg()"><br>
+<table id="showHead">
+
+    <tbody id="showWords">
+    </tbody>
+</table>
+<b id="page"></b>
+</body>
+</html>

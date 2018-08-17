@@ -5,24 +5,275 @@
     <title>Title</title>
     <script type="text/javascript" src="js/jquery-2.1.0.js"></script>
     <script type="text/javascript">
-        document.location.getURLPara = function (name) {
-            var reg = new RegExp("[^\?&]?" + encodeURI(name) + "=[^&]+");
-            var arr = this.search.match(reg);
-            if (arr != null) {
-                return decodeURI(arr[0].substring(arr[0].search("=") + 1));
-            }
-            return "";
-        };
         $(function () {
-            var picturename = document.location.getURLPara("picture");
-            $("img").attr("src","/photo/"+picturename);
+            $.ajax({
+                type : "get",
+                url : "/success",
+                dataType : "json",
+                success : function(result) {
+                    if(result.code===100){
+                        alert("请登录")
+                    }else {
+                        $("#username").append(result.username);
+                        $("img").attr("src",result.headurl);
+                    }
+                },
+                error : function() {
+                    alert("請求失敗");
+                }
+            });
+        });
+
+
+
+        function updata() {
+            var formata = new FormData();
+            formata.append("img",$("#img")[0].files[0]);
+            $.ajax({
+               type:"post",
+               url:"/updateImg",
+               data:formata,
+                contentType:false,
+                processData:false,
+                async:false,
+                cache:false,
+                success :function (result) {
+                       if(result.code===100){
+                           alert("请登录")
+                       }else {
+                           $("#img").replaceWith("<input type='file' name='img' id='img'>");
+                           alert("添加成功")
+                       }
+                   }
+        });
+        }
+
+
+
+        $(document).on("click",".delete",function () {
+            var id = $(this).attr("id");
+            $.ajax({
+                type:"post",
+                url:"/deleteImg",
+                data:{id:id},
+                dataType:"json",
+                success:function (result) {
+                    if(result.code===0){
+                        $("#b"+id+"").remove();
+                        $("#a"+id+"").remove();
+                        $("#"+id+"").remove();
+                    }else if(result.code===100){
+                        alert("请登录")
+                    }else {
+                        alert("删除失败")
+                    }
+                }
+            });
+        });
+
+        var imgId = new Array();
+        var aId = new Array();
+      function show_img() {
+           var pageNumber = 1;
+           $.ajax({
+               type : "post",
+               url : "/show",
+               data:{pageNumber:pageNumber},
+               dataType : "json",
+               success : function(result) {
+                   if(result.code===100){
+                       alert("请登录")
+                   }else {
+                   for(var i = 0;i<result.pageSize;i++){
+                       $("#addimg").append("<td id=a"+result.data[i].id+"><p >"+result.data[i].imgdate+"</p><img src=" + result.data[i].imgurl +" height='100px' width='100px' ><input type='button' value='删除' class='delete' id="+result.data[i].id+"></td>");
+                       if(result.pageNumber===result.totalPage&&result.totalRecord<result.pageNumber*result.pageSize){
+                           result.pageSize = result.totalRecord%result.pageSize;
+                       }
+                       imgId[i] = result.data[i].id;
+                   }
+                   for(var j =1;j<=result.totalPage;j++){
+                       $("#showimg").append("<b id=d"+j+"><button  class='skip' id="+j+">第"+j+"页&nbsp;&nbsp;&nbsp;</button></b>");
+                       aId[j] = "d"+j;
+                   }
+                   }
+               }
+           });
+          $(".showimg").attr("disabled","disabled");
+       }
+
+       $(document).on("click",".skip",function () {
+           var pageNumber = $(this).attr("id");
+           for(var i = 0;i<imgId.length;i++){
+               $("#a"+imgId[i]+"").remove();
+           }
+           for(var j = 1;j<=aId.length;j++){
+               $("#"+aId[j]+"").remove();
+           }
+           $.ajax({
+               type : "post",
+               url : "/show",
+               data:{pageNumber:pageNumber},
+               dataType : "json",
+               success : function(result) {
+                   if(result.code===100){
+                       alert("请登录")
+                   }else {
+
+                   for(var i = 0;i<result.pageSize;i++){
+                       $("#addimg").append("<td id=a"+result.data[i].id+"><p >"+result.data[i].imgdate+"</p><img src=" + result.data[i].imgurl +" height='100px' width='100px' ><input type='button' value='删除' class='delete' id="+result.data[i].id+"></td>");
+                       if(result.pageNumber===result.totalPage&&result.totalRecord<result.pageNumber*result.pageSize){
+                           result.pageSize = result.totalRecord%result.pageSize;
+                       }
+                       imgId[i] = result.data[i].id;
+                   }
+
+                   for(var j =1;j<=result.totalPage;j++){
+                       $("#showimg").append("<b id=d"+j+"><button class='skip' id="+j+">第"+j+"页&nbsp;&nbsp;&nbsp;</button></b>");
+                       aId[j] = "d"+j;
+                   }
+                   }
+               }
+           })
+       });
+
+
+        function leaveWords() {
+            var words = $("#wordsmsg").val();
+            var tel = $("#telmsg").val();
+            if(words==null||tel==null){
+                alert("请填写留言和联系方式！" );
+            }
+            $.ajax({
+                type:"post",
+                url:"/leave",
+                data:JSON.stringify({words:words,tel:tel}),
+                dataType:"json",
+                contentType:"application/json",
+                success:function (result) {
+                    if(result.code===0){
+                        alert("留言成功！");
+                        $("#leavemsg").attr("disabled","disabled");
+                    }else if(result.code===-1){
+                        alert("留言失败")
+                    }else if(result.code===-2){
+                        alert("填写留言不完整")
+                    }else if (result.code===-3){
+                        alert("手机号格式不正确")
+                    }
+                }
+
+            })
+        }
+
+
+        var msgId = new Array();
+        var fId = new Array();
+        function showmsg() {
+            var pageNumber = 1;
+            $.ajax({
+                type:"post",
+                url:"/showmsg",
+                data:{pageNumber:pageNumber},
+                dataType:"json",
+                success:function (result) {
+                    if(result.code===100){
+                        alert("请先登录")
+                    }else {
+                    for(var i = 0;i<result.pageSize;i++){
+                        $("#showWords").append("<tr id=e"+result.data[i].id+"><td><b>"+result.data[i].words+"</b></td><td>"+result.data[i].time+"&nbsp;&nbsp;&nbsp;</td></tr>");
+                        if(result.pageNumber===result.totalPage&&result.totalRecord<result.pageNumber*result.pageSize){
+                            result.pageSize = result.totalRecord%result.pageSize;
+                        }
+                        msgId[i] = result.data[i].id;
+                    }
+
+                    for(var j =1;j<=result.totalPage;j++){
+                        $("#showWords").append("<b id=f"+j+"><button  class='skipmsg' id="+j+">第"+j+"页&nbsp;&nbsp;&nbsp;</button></b>");
+                        fId[j] = j;
+                    }
+                    }
+                }
+            });
+            $("#mywords").attr("disabled","disabled");
+        }
+
+        $(document).on("click",".skipmsg",function () {
+            var pageNumber = $(this).attr("id");
+            for(var i = 0;i<msgId.length;i++){
+                $("#e"+msgId[i]+"").remove();
+            }
+            for(var j = 1;j<fId.length;j++){
+                $("#f"+fId[j]+"").remove();
+            }
+            $.ajax({
+                type : "post",
+                url : "/showmsg",
+                data:{pageNumber:pageNumber},
+                dataType : "json",
+                success : function(result) {
+                    if(result.code===100){
+                        alert("请登录")
+                    }else {
+                    for(var i = 0;i<result.pageSize;i++){
+                        $("#showWords").append("<tr id=e"+result.data[i].id+"><td><b>"+result.data[i].words+"</b></td><td>"+result.data[i].time+"&nbsp;&nbsp;&nbsp;</td></tr>");
+                        if(result.pageNumber===result.totalPage&&result.totalRecord<result.pageNumber*result.pageSize){
+                            result.pageSize = result.totalRecord%result.pageSize;
+                        }
+                        msgId[i] = result.data[i].id;
+                    }
+
+                    for(var j =1;j<=result.totalPage;j++){
+                        $("#showWords").append("<b id=f"+j+"><button  class='skipmsg' id="+j+">第"+j+"页&nbsp;&nbsp;&nbsp;</button></b>");
+                        fId[j] = j;
+                    }
+                    }
+                }
+            })
         })
+
+
+        function showReply() {
+            $.ajax({
+                type:"get",
+                url:"/myReply",
+                dataType:"json",
+                success:function (result) {
+                    if(result.code===100){
+                        alert("请登录")
+                    }else if(result.code===-1) {
+                        alert("没有回复")
+                    }
+                    else {
+                        for (var i = 0;i<result.list1.length;i++){
+                            //alert(result.list1[i].reply);
+                            $("#reply").append("<tr><td>"+result.list2[i].words+"&nbsp;&nbsp;&nbsp;</td><td>"+result.list1[i].reply+"&nbsp;&nbsp;&nbsp;</td><td>"+result.list1[i].date+"</td></tr>")
+                        }
+                    }
+                }
+            })
+        }
     </script>
 
 </head>
-
 <body>
-   成功………………
-    <img src="" height="100px" width="100px"/>
+<h5>个人中心：</h5>
+    <p id="username">用户名：</p>
+    <img src="" height="100px" width="100px"><br>
+    <input type="button" value="个人相册" class="showimg"  onclick="show_img()">
+    <table>
+        <tr id="addimg"></tr>
+    </table>
+    <p id="showimg"></p>
+    添加图片：<input type="file" name="img" id="img" >
+    <input type="button" value="添加" onclick="updata()"><br>
+    留言：<input type="text" id="wordsmsg" maxlength="30" size="30">
+    联系方式：<input type="text" id="telmsg" size="20" maxlength="30" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')" onafterpaste="this.value=this.value.replace(/[^0-9]/g,'')" >
+    <input type="button" value="提交" id="leavemsg" onclick="leaveWords()"><br>
+    <input type="button" value="我的留言" id="mywords" onclick="showmsg()"><br>
+    <table id="showWords">
+    </table><br>
+    <button id="myReply" onclick="showReply()">我的回复</button>
+    <table id="reply"></table>
+
 </body>
 </html>

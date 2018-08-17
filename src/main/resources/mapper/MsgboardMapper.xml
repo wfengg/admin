@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.demo.demo01.mapper.MsgboardMapper" >
+  <resultMap id="BaseResultMap" type="com.demo.demo01.bean.Msgboard" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="words" property="words" jdbcType="VARCHAR" />
+    <result column="tel" property="tel" jdbcType="BIGINT" />
+    <result column="userid" property="userid" jdbcType="INTEGER" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, words, tel, userid, time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.demo.demo01.bean.MsgboardExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from msgboard
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from msgboard
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from msgboard
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.demo.demo01.bean.MsgboardExample" >
+    delete from msgboard
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.demo.demo01.bean.Msgboard" >
+    insert into msgboard (id, words, tel, 
+      userid, time)
+    values (#{id,jdbcType=INTEGER}, #{words,jdbcType=VARCHAR}, #{tel,jdbcType=BIGINT},
+      #{userid,jdbcType=INTEGER}, #{time,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.demo.demo01.bean.Msgboard" >
+    insert into msgboard
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+        words,
+        tel,
+      <if test="userid != null" >
+       userid,
+      </if>
+        time,
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+        #{words,jdbcType=VARCHAR},
+        #{tel,jdbcType=BIGINT},
+      <if test="userid != null" >
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.demo.demo01.bean.MsgboardExample" resultType="java.lang.Integer" >
+    select count(*) from msgboard
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update msgboard
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.words != null" >
+        words = #{record.words,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tel != null" >
+        tel = #{record.tel,jdbcType=BIGINT},
+      </if>
+      <if test="record.userid != null" >
+        userid = #{record.userid,jdbcType=INTEGER},
+      </if>
+      <if test="record.time != null" >
+        time = #{record.time,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update msgboard
+    set id = #{record.id,jdbcType=INTEGER},
+      words = #{record.words,jdbcType=VARCHAR},
+      tel = #{record.tel,jdbcType=BIGINT},
+      userid = #{record.userid,jdbcType=INTEGER},
+      time = #{record.time,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.demo.demo01.bean.Msgboard" >
+    update msgboard
+    <set >
+      <if test="words != null" >
+        words = #{words,jdbcType=VARCHAR},
+      </if>
+      <if test="tel != null" >
+        tel = #{tel,jdbcType=BIGINT},
+      </if>
+      <if test="userid != null" >
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="time != null" >
+        time = #{time,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.demo.demo01.bean.Msgboard" >
+    update msgboard
+    set words = #{words,jdbcType=VARCHAR},
+      tel = #{tel,jdbcType=BIGINT},
+      userid = #{userid,jdbcType=INTEGER},
+      time = #{time,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByUSerId" resultMap="BaseResultMap" >
+    select * from msgboard where userid = #{userid,jdbcType=INTEGER} limit #{startIndex},#{pageSize}
+  </select>
+
+  <select id="getTotalRecord" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+  select count(*) from msgboard where userid = #{userid,jdbcType=INTEGER}
+ </select>
+
+  <select id="getTotalRecords" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select count(*) from msgboard
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select * from msgboard  limit #{startIndex},#{pageSize}
+  </select>
+</mapper>

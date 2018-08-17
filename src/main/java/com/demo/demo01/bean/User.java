@@ -40,4 +40,14 @@ public class User {
     public void setHeadurl(String headurl) {
         this.headurl = headurl == null ? null : headurl.trim();
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", headurl='" + headurl + '\'' +
+                '}';
+    }
 }

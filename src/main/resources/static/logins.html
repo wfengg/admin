@@ -6,6 +6,7 @@
     <script type="text/javascript" src="js/jquery-2.1.0.js"></script>
     <script type="text/javascript">
         function login(){
+
             var username = $("#username").val();
             var password = $("#password").val();
             var data = {
@@ -19,8 +20,10 @@
                 dataType : 'json',
                 contentType : 'application/json',
                 success : function(result) {
-                      if(result!=0){
+                      if(result.code===0){
                           location.href="/success.html";
+                      }else if(result.code===3){
+                          location.href="/admin.html";
                       }
                       else location.href="failed.html";
                 }
@@ -28,12 +31,43 @@
             cfg.url = "/login";
             $.ajax(cfg);
         }
+
+        function leave() {
+            var words = $("#words").val();
+            var tel = $("#tel").val();
+            $.ajax({
+                type:"post",
+                url:"/firstLeave",
+                data:JSON.stringify({words:words,tel:tel}),
+                dataType:"json",
+                contentType:"application/json",
+                success:function (result) {
+
+                    if(result.code===0){
+                        alert("留言成功！");
+                        $("#tijiao").attr("disabled","disabled");
+                    }else if(result.code===-1){
+                        alert("留言失败")
+                    }else if(result.code===-2){
+                        alert("填写留言不完整")
+                    }else if(result.code===100){
+                        alert("请登录")
+                    }else if(result.code===-3){
+                        alert("请输入正确手机号")
+                    }
+                }
+
+            })
+        }
     </script>
 </head>
 <body>
 用户名：<input type="text" name="username" id="username"/></br>
 密码：<input type="password" name="password" id="password"/></br>
 <input type="button" value="登陆" id="login" onclick="login()"/></br>
-<input type="button" value="注册" onclick="location.href='/register.html'">
+<input type="button" value="注册" onclick="location.href='/register.html'"><br>
+留言：<input type="text" id="words" size="30" maxlength="30">
+联系方式：<input type="text" id="tel" size="20" maxlength="20" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')" onafterpaste="this.value=this.value.replace(/[^0-9]/g,'')">
+<input type="button" value="提交" id="tijiao" onclick="leave()">
 </body>
 </html>
